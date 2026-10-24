@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-ioBroker adapter `webhook` (npm `iobroker.webhook`, TypeScript in `src/`, compiled to `build/`) that turns every incoming HTTP request into states. It either runs its own `node:http` server (standalone) or, when `native.webInstance` is set, runs inside the `web` adapter as a web extension. No runtime dependencies besides `@iobroker/adapter-core`. Node >= 22.19, js-controller >= 6.0.11, admin >= 7.7.22. User-facing README is in German; changelog entries in English.
+ioBroker adapter `webhook` (npm `iobroker.webhook`, TypeScript in `src/`, compiled to `build/`) that turns every incoming HTTP request into states. It either runs its own `node:http` server (standalone) or, when `native.webInstance` is set, runs inside the `web` adapter as a web extension. No runtime dependencies besides `@iobroker/adapter-core`. Node >= 22.19, js-controller >= 6.0.11, admin >= 7.7.22. README.md is English (with changelog and license); the German documentation is `docs/de/README.md` - keep both in sync.
 
 The adapter was renamed from `iobroker-webhook` (the io-package schema forbids names starting with "iobroker"); the GitHub repository URLs still point to `ioBroker.iobroker-webhook`.
 

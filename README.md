@@ -1,85 +1,87 @@
 ![Logo](admin/webhook.png)
 
-# ioBroker Webhook Adapter
+# ioBroker.webhook
 
-Der ioBroker Webhook Adapter ermöglicht es, HTTP-Anfragen zu empfangen und die Daten in ioBroker-Objekte zu speichern. Dies ist nützlich, um Daten von externen Diensten oder Geräten in ioBroker zu integrieren.
+The webhook adapter receives HTTP requests and stores the transmitted data as ioBroker states. This integrates external services and devices that can send webhooks without writing any code.
+
+[Deutsche Dokumentation](docs/de/README.md)
 
 ## Installation
 
-1. Klone das Repository oder lade die Dateien herunter.
-2. Navigiere in das Verzeichnis des Adapters, installiere die Abhängigkeiten und baue den Adapter (der Quellcode liegt als TypeScript in `src/`):
-   ```bash
-   npm ci
-   npm run build
-   ```
-3. Starte den Adapter über die ioBroker Admin-Oberfläche oder über die Kommandozeile:
-   ```bash
-   iobroker start webhook
-   ```
+Install the adapter like any other adapter via the ioBroker admin.
 
-## Konfiguration
+For development: clone the repository, install the dependencies and build it (the sources are TypeScript in `src/`):
 
-Der Adapter kann über die ioBroker Admin-Oberfläche konfiguriert werden. Die wichtigsten Konfigurationsoptionen sind:
+```bash
+npm ci
+npm run build
+```
 
-- **WEB-Adapter erweitern**: Ist hier eine `web`-Instanz (oder „alle“) ausgewählt, startet der Adapter keinen eigenen Server, sondern läuft als Erweiterung des Web-Adapters auf dessen Port (inkl. HTTPS und Authentifizierung des Web-Adapters). Die Instanz selbst beendet sich dann nach dem Start, das ist so gewollt.
-- **Port**: Der Port, auf dem der eigene Webhook-Server lauscht (Standard: 8095). Nur ohne Web-Erweiterung.
-- **Route**: Pfad unter dem Web-Adapter (Standard: `webhook`). Webhooks werden dann unter `http(s)://<web>:8082/webhook/<pfad>` empfangen. Nur als Web-Erweiterung.
+## Configuration
 
-## Funktionsweise
+- **Extend WEB adapter**: if a `web` instance (or "all") is selected, the adapter does not start its own server but runs as an extension of the web adapter on its port (including HTTPS and the authentication of the web adapter). The instance itself terminates after the start, this is intended.
+- **Port**: the port of the own webhook server (default: 8095). Only without the web extension.
+- **Route**: the path below the web adapter (default: `webhook`). Webhooks are then received under `http(s)://<web>:8082/webhook/<path>`. Only as web extension.
 
-### Webhook-Server
+## How it works
 
-Der Adapter startet einen schlanken HTTP-Server (ohne zusätzliche Abhängigkeiten), der HTTP-Anfragen auf dem konfigurierten Port empfängt – oder hängt sich als Erweiterung in den Web-Adapter ein. Die empfangenen Daten werden in ioBroker-Objekte umgewandelt und gespeichert.
+### Webhook server
 
-### Datenverarbeitung
+The adapter starts a lean HTTP server (without additional dependencies) on the configured port, or hooks into the web adapter as an extension.
 
-Die empfangenen Daten werden rekursiv verarbeitet und in ioBroker-Objekte umgewandelt. Dabei werden die Daten in zwei Kategorien unterteilt:
+With js-controller 8, the own server reports its port to the host as a used resource. If the port is already in use, the error message names the instance that holds it, e.g. `port 8095 is already used by web.0`.
 
-- **Meta-Daten**: Informationen über die Anfrage (IP-Adresse, HTTP-Methode, Zeitstempel).
-- **Daten**: Bei POST, PUT und PATCH der JSON-Body (`Content-Type: application/json`, max. 100 KB), bei allen anderen Methoden die Query-Parameter (`?a=1&b[c]=2`).
+### Data processing
 
-### Rollen
+The received data is processed recursively, one state is created for every single value. There are two parts:
 
-Beim Anlegen eines Datenpunkts versucht der Adapter, anhand des Attributnamens eine passende [Rolle](https://github.com/ioBroker/ioBroker.docs/blob/master/docs/en/dev/stateroles.md) zu finden – in beliebiger Schreibweise (`outsideTemp`, `outside_temp`, `OUTSIDE-TEMP`) und für gängige englische und deutsche Begriffe, z. B.:
+- **`meta`**: information about the request (IP address, HTTP method, timestamp).
+- **`data`**: for POST, PUT and PATCH the JSON body (`Content-Type: application/json`, max. 100 KB), for all other methods the query parameters (`?a=1&b[c]=2`).
 
-| Attribut | Typ | Rolle |
-|---|---|---|
-| `temperature`, `temp`, `Temperatur` | Zahl | `value.temperature` |
-| `humidity`, `luftfeuchtigkeit` | Zahl | `value.humidity` |
-| `battery`, `akku` | Zahl / Boolean | `value.battery` / `indicator.lowbat` |
-| `co2`, `pm2_5`, `voc` | Zahl | `value.co2`, `value.pm25`, `value.tvoc` |
-| `power`, `voltage`, `energy` | Zahl | `value.power`, `value.voltage`, `value.energy` |
-| `motion`, `door`, `window`, `fenster` | Boolean | `sensor.motion`, `sensor.door`, `sensor.window` |
-| `lat`, `lon` | Zahl | `value.gps.latitude`, `value.gps.longitude` |
-| `ip`, `timestamp` | Text | `info.ip`, `date` |
+Characters that are not allowed in IDs are replaced by `_`. Numbers as text (e.g. query parameters) are stored as numbers if this is lossless; `"007"` stays a string.
 
-Ist der Name selbst unbekannt, wird der übergeordnete Name verwendet: `{"temperature": {"value": 21}}` oder `/temperatur?value=21` ergeben ebenfalls `value.temperature`. Ohne Treffer gilt je nach Typ `value`, `indicator` oder `text`.
+### Paths
 
-Für Zahlen werden zusätzlich Einheit sowie `min`/`max` gesetzt, wo sie eindeutig sind:
+The path of the URL defines where the data is stored: a request to `/livingroom/window` ends up in `webhook.0.livingroom.window.*`, a request to `/` directly in `webhook.0.*`.
 
-| Attribut | Einheit | min / max |
-|---|---|---|
-| `temperature` | °C | – |
-| `humidity`, `battery`, `clouds`, `dimmer`, `position` | % | 0 / 100 |
-| `windDirection`, `heading` | ° | 0 / 360 |
-| `lat` / `lon` | ° | -90 / 90 bzw. -180 / 180 |
-| `pressure` | hPa | – |
-| `power`, `voltage`, `current`, `energy` | W, V, A, kWh | – |
-| `co2`, `pm2_5`, `rssi` | ppm, µg/m³, dBm | – |
+### Roles
 
-Eine Einheit im Namen hat Vorrang: `tempF` → °F, `power_kW` → kW, `energyWh` → Wh, `windSpeedKmh` → km/h, `pressure_pa` → Pa, `battery_mV` → mV. Namen mit `percent`/`pct`/`prozent` bekommen immer % und 0–100. Bei mehrdeutigen Größen wie `speed` oder `distance` wird nur eine Einheit aus dem Namen übernommen. Liegt der erste empfangene Wert außerhalb von `min`/`max` (z. B. `battery: 3000`), war die Vermutung falsch und Einheit und Grenzen entfallen.
+When a state is created, the adapter tries to find a matching [role](https://github.com/ioBroker/ioBroker.docs/blob/master/docs/en/dev/stateroles.md) from the attribute name, in any notation (`outsideTemp`, `outside_temp`, `OUTSIDE-TEMP`) and for common English and German terms, e.g.:
 
-Rolle, Einheit und Grenzen werden nur beim ersten Anlegen gesetzt – von Hand geänderte Werte bleiben erhalten, bestehende Datenpunkte werden nicht angepasst.
+| Attribute                             | Type             | Role                                            |
+|---------------------------------------|------------------|-------------------------------------------------|
+| `temperature`, `temp`, `Temperatur`   | number           | `value.temperature`                             |
+| `humidity`, `luftfeuchtigkeit`        | number           | `value.humidity`                                |
+| `battery`, `akku`                     | number / boolean | `value.battery` / `indicator.lowbat`            |
+| `co2`, `pm2_5`, `voc`                 | number           | `value.co2`, `value.pm25`, `value.tvoc`         |
+| `power`, `voltage`, `energy`          | number           | `value.power`, `value.voltage`, `value.energy`  |
+| `motion`, `door`, `window`, `fenster` | boolean          | `sensor.motion`, `sensor.door`, `sensor.window` |
+| `lat`, `lon`                          | number           | `value.gps.latitude`, `value.gps.longitude`     |
+| `ip`, `timestamp`                     | string           | `info.ip`, `date`                               |
 
-Unzulässige Zeichen in Pfad und Attributnamen werden durch `_` ersetzt. Zahlen in Textform (z. B. Query-Parameter) werden als Zahl gespeichert, wenn das verlustfrei geht – `"007"` bleibt Text.
+If the name itself is unknown, the name of the parent is used: `{"temperature": {"value": 21}}` and `/temperature?value=21` result in `value.temperature` too. Without a match, the role is `value`, `indicator` or `text`, depending on the type.
 
-### Pfadverarbeitung
+### Units and ranges
 
-Der Adapter verarbeitet auch Pfade in den URLs der HTTP-Anfragen und speichert die Daten entsprechend der Pfadstruktur in ioBroker-Objekten. Zum Beispiel wird eine Anfrage an `/wohnzimmer/fenster` in die entsprechenden Pfade in ioBroker umgewandelt.
+For numbers, the unit and `min`/`max` are set too, where they are unambiguous:
 
-### Beispiel
+| Attribute                                             | Unit            | min / max                 |
+|-------------------------------------------------------|-----------------|---------------------------|
+| `temperature`                                         | °C              | –                         |
+| `humidity`, `battery`, `clouds`, `dimmer`, `position` | %               | 0 / 100                   |
+| `windDirection`, `heading`                            | °               | 0 / 360                   |
+| `lat` / `lon`                                         | °               | -90 / 90 and -180 / 180   |
+| `pressure`                                            | hPa             | –                         |
+| `power`, `voltage`, `current`, `energy`               | W, V, A, kWh    | –                         |
+| `co2`, `pm2_5`, `rssi`                                | ppm, µg/m³, dBm | –                         |
 
-Angenommen, eine HTTP-POST-Anfrage wird an den Adapter gesendet mit folgendem JSON-Body:
+A unit in the name wins: `tempF` → °F, `power_kW` → kW, `energyWh` → Wh, `windSpeedKmh` → km/h, `pressure_pa` → Pa, `battery_mV` → mV. Names with `percent`/`pct`/`prozent` always get % and 0–100. For ambiguous quantities like `speed` or `distance`, only a unit from the name is used. If the first received value is outside `min`/`max` (e.g. `battery: 3000`), the guess was wrong and unit and range are omitted.
+
+Role, unit and range are only set when the state is created: values changed by hand are kept, existing states are not modified.
+
+### Example
+
+An HTTP POST request to `/livingroom/window` with this JSON body:
 
 ```json
 {
@@ -88,28 +90,18 @@ Angenommen, eine HTTP-POST-Anfrage wird an den Adapter gesendet mit folgendem JS
 }
 ```
 
-Der Adapter speichert die Daten in den folgenden ioBroker-Objekten:
+creates these states:
 
-- `webhook.0.wohnzimmer.fenster.data.temperature`
-- `webhook.0.wohnzimmer.fenster.data.humidity`
+- `webhook.0.livingroom.window.data.temperature` (`value.temperature`, °C)
+- `webhook.0.livingroom.window.data.humidity` (`value.humidity`, %, 0–100)
 
-Zusätzlich werden Meta-Daten gespeichert:
+Additionally, the meta data is stored:
 
-- `webhook.0.wohnzimmer.fenster.meta.ip`
-- `webhook.0.wohnzimmer.fenster.meta.method`
-- `webhook.0.wohnzimmer.fenster.meta.timestamp`
+- `webhook.0.livingroom.window.meta.ip`
+- `webhook.0.livingroom.window.meta.method`
+- `webhook.0.livingroom.window.meta.timestamp`
 
-## Ereignisse
-
-Der Adapter registriert die folgenden Ereignisse:
-
-- **ready**: Wird ausgelöst, wenn der Adapter bereit ist.
-- **stateChange**: Wird ausgelöst, wenn sich der Zustand eines Objekts ändert.
-- **unload**: Wird ausgelöst, wenn der Adapter entladen wird.
-
-## Fehlerbehandlung
-
-Der Adapter behandelt Fehler beim Starten und Stoppen des Servers und protokolliert entsprechende Fehlermeldungen.
+The adapter answers with `{"status": "success"}`. Invalid JSON is rejected with `400`, a body that is too large with `413`.
 
 ## Changelog
 <!--
