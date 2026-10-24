@@ -124,6 +124,7 @@ Der Adapter behandelt Fehler beim Starten und Stoppen des Servers und protokolli
 - (bluefox) Role, unit and min/max of the states are detected from the attribute names (e.g. `temperature` -> `value.temperature` in °C, `power_kW` -> `value.power` in kW)
 - (bluefox) The adapter can run as a web extension (option "Extend WEB adapter")
 - (bluefox) express, body-parser and cors were replaced by node:http
+- (bluefox) The port of the server is reported to js-controller 8 as used resource; if the port is in use, the error names the instance holding it
 - (bluefox) Fixed: the adapter crashed if the port was in use, on `null` values and on characters that are not allowed in IDs (these are replaced by `_` now)
 - (bluefox) Fixed: numeric strings (e.g. query parameters) are stored as numbers, if this is lossless (`"007"` stays a string)
 - (bluefox) Fixed: a request to `/` is stored directly below `webhook.X` instead of `webhook.X.undefined`

@@ -146,6 +146,7 @@
     "webExtension": "build/lib/web.js",
     "type": "communication",
     "compact": true,
+    "declareUsedResources": true,
     "nogit": true,
     "connectionType": "local",
     "dataSource": "push",
