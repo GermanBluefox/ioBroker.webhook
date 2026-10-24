@@ -4,7 +4,7 @@
     "items": {
         "_logo": {
             "type": "staticImage",
-            "src": "webhook.png",
+            "src": "webhook.svg",
             "style": { "width": "64px" },
             "xs": 12,
             "sm": 12,

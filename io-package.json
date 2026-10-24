@@ -136,9 +136,9 @@
       "license": "MIT"
     },
     "platform": "Javascript/Node.js",
-    "icon": "webhook.png",
+    "icon": "webhook.svg",
     "enabled": true,
-    "extIcon": "https://raw.githubusercontent.com/GermanBluefox/ioBroker.webhook/main/admin/webhook.png",
+    "extIcon": "https://raw.githubusercontent.com/GermanBluefox/ioBroker.webhook/main/admin/webhook.svg",
     "readme": "https://github.com/GermanBluefox/ioBroker.webhook/blob/main/README.md",
     "docs": {
       "en": "README.md",

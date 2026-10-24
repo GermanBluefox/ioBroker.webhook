@@ -1,4 +1,4 @@
-![Logo](../../admin/webhook.png)
+![Logo](../../admin/webhook.svg)
 
 # ioBroker Webhook Adapter
 

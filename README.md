@@ -1,4 +1,4 @@
-![Logo](admin/webhook.png)
+![Logo](admin/webhook.svg)
 
 # ioBroker.webhook
 
@@ -121,6 +121,7 @@ The adapter answers with `{"status": "success"}`. Invalid JSON is rejected with 
 - (bluefox) Fixed: numeric strings (e.g. query parameters) are stored as numbers, if this is lossless (`"007"` stays a string)
 - (bluefox) Fixed: a request to `/` is stored directly below `webhook.X` instead of `webhook.X.undefined`
 - (bluefox) The JSON body of PUT and PATCH requests is stored too
+- (bluefox) New SVG icon
 - (bluefox) Breaking change: the adapter was renamed from `iobroker-webhook` to `webhook`. Existing `iobroker-webhook` instances must be replaced by a new `webhook` instance, the state IDs change from `iobroker-webhook.X.*` to `webhook.X.*`
 
 ### 0.2.4 (2025-01-25)
