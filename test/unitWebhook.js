@@ -12,6 +12,8 @@ function createFakeAdapter() {
     return {
         objects,
         states,
+        // the same as js-controller
+        FORBIDDEN_CHARS: /[^._\-/ :!#$%&()+=@^{}|~\p{Ll}\p{Lu}\p{Nd}]+/gu,
         log: { error: () => {}, warn: () => {}, info: () => {}, debug: () => {} },
         setForeignObjectNotExistsAsync: async (id, obj) => {
             objects[id] ??= obj;
@@ -73,11 +75,36 @@ describe('Webhook', () => {
     });
 
     it('should store query parameters of GET', async () => {
-        const res = await fetch(`${baseUrl}/garten?level=3&name=pump`);
+        const res = await fetch(`${baseUrl}/garten?level=3&name=pump&zip=01067&empty=`);
         assert.strictEqual(res.status, 200);
-        assert.strictEqual(adapter.states['webhook.0.garten.data.level'].val, '3');
+        // lossless numeric strings become numbers
+        assert.strictEqual(adapter.states['webhook.0.garten.data.level'].val, 3);
+        assert.strictEqual(adapter.objects['webhook.0.garten.data.level'].common.type, 'number');
+        assert.strictEqual(adapter.states['webhook.0.garten.data.zip'].val, '01067');
+        assert.strictEqual(adapter.objects['webhook.0.garten.data.zip'].common.type, 'string');
+        assert.strictEqual(adapter.states['webhook.0.garten.data.empty'].val, '');
         assert.strictEqual(adapter.states['webhook.0.garten.data.name'].val, 'pump');
         assert.strictEqual(adapter.states['webhook.0.garten.meta.method'].val, 'GET');
+    });
+
+    it('should store a request to "/" directly below the namespace', async () => {
+        await fetch(`${baseUrl}/?a=1`);
+        assert.strictEqual(adapter.states['webhook.0.data.a'].val, 1);
+        assert.strictEqual(adapter.states['webhook.0.meta.method'].val, 'GET');
+    });
+
+    it('should replace forbidden characters and empty parts in IDs', async () => {
+        await fetch(`${baseUrl}/my%20room/a*b`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 'x?y': 1, 'c..d': 2, '': 3, nothing: null }),
+        });
+        assert.strictEqual(adapter.states['webhook.0.my room.a_b.data.x_y'].val, 1);
+        assert.strictEqual(adapter.states['webhook.0.my room.a_b.data.c._.d'].val, 2);
+        assert.strictEqual(adapter.states['webhook.0.my room.a_b.data._'].val, 3);
+        assert.strictEqual(adapter.states['webhook.0.my room.a_b.data.nothing'].val, null);
+        assert.strictEqual(adapter.objects['webhook.0.my room.a_b.data.nothing'].common.type, 'mixed');
+        assert.strictEqual(adapter.objects['webhook.0.my room.a_b.data.x_y'].common.name, 'x?y');
     });
 
     it('should ignore bodies that are not JSON', async () => {

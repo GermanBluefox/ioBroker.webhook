@@ -36,7 +36,7 @@ Der Adapter startet einen schlanken HTTP-Server (ohne zusätzliche Abhängigkeit
 Die empfangenen Daten werden rekursiv verarbeitet und in ioBroker-Objekte umgewandelt. Dabei werden die Daten in zwei Kategorien unterteilt:
 
 - **Meta-Daten**: Informationen über die Anfrage (IP-Adresse, HTTP-Methode, Zeitstempel).
-- **Daten**: Bei POST der JSON-Body (`Content-Type: application/json`, max. 100 KB), bei allen anderen Methoden die Query-Parameter (`?a=1&b[c]=2`).
+- **Daten**: Bei POST, PUT und PATCH der JSON-Body (`Content-Type: application/json`, max. 100 KB), bei allen anderen Methoden die Query-Parameter (`?a=1&b[c]=2`).
 
 ### Pfadverarbeitung
 
@@ -88,6 +88,10 @@ Der Adapter behandelt Fehler beim Starten und Stoppen des Servers und protokolli
 - (bluefox) Breaking change: Node.js >= 22.19 is required
 - (bluefox) The adapter can run as a web extension (option "Extend WEB adapter")
 - (bluefox) express, body-parser and cors were replaced by node:http
+- (bluefox) Fixed: the adapter crashed if the port was in use, on `null` values and on characters that are not allowed in IDs (these are replaced by `_` now)
+- (bluefox) Fixed: numeric strings (e.g. query parameters) are stored as numbers, if this is lossless (`"007"` stays a string)
+- (bluefox) Fixed: a request to `/` is stored directly below `webhook.X` instead of `webhook.X.undefined`
+- (bluefox) The JSON body of PUT and PATCH requests is stored too
 - (bluefox) Breaking change: the adapter was renamed from `iobroker-webhook` to `webhook`. Existing `iobroker-webhook` instances must be replaced by a new `webhook` instance, the state IDs change from `iobroker-webhook.X.*` to `webhook.X.*`
 
 ### 0.2.4 (2025-01-25)

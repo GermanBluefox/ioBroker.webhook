@@ -17,16 +17,21 @@ class HttpError extends Error {
     }
 }
 
-/** Determines the `common.type` of a received value */
-function determineType(value: JsonPrimitive): string {
-    if (value === null) {
-        return 'null';
-    }
-    // String representing a number. Note: the value itself is stored unconverted
-    if (typeof value === 'string' && !isNaN(value.trim() as unknown as number)) {
-        return 'number';
-    }
-    return typeof value;
+/** Methods whose JSON body is stored. All others store the query parameters */
+const BODY_METHODS = new Set(['POST', 'PUT', 'PATCH']);
+
+/**
+ * Query parameters are always strings: "22.5" is stored as number. Only if the conversion is
+ * lossless, so "007", "+49170..." or "" stay strings.
+ */
+function normalizeValue(value: JsonPrimitive): JsonPrimitive {
+    return typeof value === 'string' && value !== '' && String(Number(value)) === value ? Number(value) : value;
+}
+
+/** Determines the `common.type` of a received value (after `normalizeValue`) */
+function determineType(value: JsonPrimitive): ioBroker.CommonType {
+    // "null" is no valid common.type, js-controller rejects the object
+    return value === null ? 'mixed' : (typeof value as 'string' | 'number' | 'boolean');
 }
 
 /**
@@ -161,12 +166,21 @@ export class Webhook {
             const pathname = queryStart === -1 ? url : url.substring(0, queryStart);
             const search = queryStart === -1 ? '' : url.substring(queryStart + 1);
 
-            const basePath =
+            // "/" is stored directly below the namespace
+            const basePath = this.toId(
                 pathname
                     .split('/')
                     .filter(part => part.trim() !== '')
-                    // Intentional legacy: a request to "/" was stored below "undefined"
-                    .join('.') || String(undefined);
+                    .map(part => {
+                        try {
+                            return decodeURIComponent(part);
+                        } catch {
+                            return part;
+                        }
+                    })
+                    .join('.'),
+            );
+            const prefix = basePath ? `${basePath}.` : '';
 
             const meta: JsonObject = {
                 ip: req.ip ?? req.socket.remoteAddress ?? null,
@@ -174,11 +188,10 @@ export class Webhook {
                 timestamp: new Date().toISOString(),
             };
 
-            // Body for POST, query parameters for everything else
-            const data = req.method === 'POST' ? await parseBody(req) : parseQuery(search);
+            const data = BODY_METHODS.has(req.method ?? '') ? await parseBody(req) : parseQuery(search);
 
-            await this.store(meta, `${basePath}.meta`);
-            await this.store(data, `${basePath}.data`);
+            await this.store(meta, `${prefix}meta`);
+            await this.store(data, `${prefix}data`);
 
             sendJson(res, 200, { status: 'success' });
         } catch (e) {
@@ -190,21 +203,36 @@ export class Webhook {
         }
     }
 
+    /**
+     * Makes a valid ID from received names: forbidden characters become "_", and so do empty
+     * parts (e.g. of the key "a..b"), which would give an invalid ID.
+     */
+    private toId(name: string): string {
+        if (!name) {
+            return '';
+        }
+        return name
+            .split('.')
+            .map(part => part.replace(this.adapter.FORBIDDEN_CHARS, '_') || '_')
+            .join('.');
+    }
+
     /** Recursively creates one state per primitive value */
     private async store(data: JsonObject | JsonValue[], parentPath: string): Promise<void> {
-        for (const [key, value] of Object.entries(data)) {
-            const id = `${parentPath}.${key}`;
+        for (const [key, raw] of Object.entries(data)) {
+            const id = `${parentPath}.${this.toId(key) || '_'}`;
 
-            if (typeof value === 'object' && value !== null) {
-                await this.store(value, id);
+            if (typeof raw === 'object' && raw !== null) {
+                await this.store(raw, id);
             } else {
+                const value = normalizeValue(raw);
                 const fullId = `${this.namespace}.${id}`;
                 await this.adapter.setForeignObjectNotExistsAsync(fullId, {
                     type: 'state',
                     common: {
                         name: key,
                         role: 'state',
-                        type: determineType(value) as ioBroker.CommonType,
+                        type: determineType(value),
                         read: true,
                         write: true,
                     },

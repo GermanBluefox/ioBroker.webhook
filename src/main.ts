@@ -38,6 +38,8 @@ class WebhookAdapter extends utils.Adapter {
 
         const webhook = new Webhook(this, this.namespace);
         this.server = createServer((req, res) => void webhook.handle(req, res));
+        // e.g. EADDRINUSE: arrives as event, not as exception of listen()
+        this.server.on('error', error => this.log.error(`Error starting the server: ${error.message}`));
         this.server.listen(port, () => this.log.info(`Webhook server running on port ${port}`));
     }
 
@@ -50,6 +52,8 @@ class WebhookAdapter extends utils.Adapter {
             this.clearTimeout(this.terminateTimer);
             if (this.server) {
                 this.server.close();
+                // keep-alive connections would delay the end of the process
+                this.server.closeAllConnections();
                 this.server = null;
                 this.log.info('Webhook server stopped.');
             }
