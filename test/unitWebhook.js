@@ -72,8 +72,15 @@ describe('Webhook', () => {
         assert.ok(adapter.states['webhook.0.wohnzimmer.fenster.meta.timestamp'].val);
         assert.strictEqual(adapter.objects['webhook.0.wohnzimmer.fenster.data.temperature'].common.type, 'number');
         assert.strictEqual(adapter.states['webhook.0.wohnzimmer.fenster.data.temperature'].ack, true);
-        assert.strictEqual(adapter.objects['webhook.0.wohnzimmer.fenster.data.temperature'].common.role, 'value.temperature');
-        assert.strictEqual(adapter.objects['webhook.0.wohnzimmer.fenster.data.sensor.open'].common.role, 'sensor.contact');
+        assert.strictEqual(
+            adapter.objects['webhook.0.wohnzimmer.fenster.data.temperature'].common.role,
+            'value.temperature',
+        );
+        assert.strictEqual(adapter.objects['webhook.0.wohnzimmer.fenster.data.temperature'].common.unit, '°C');
+        assert.strictEqual(
+            adapter.objects['webhook.0.wohnzimmer.fenster.data.sensor.open'].common.role,
+            'sensor.contact',
+        );
         assert.strictEqual(adapter.objects['webhook.0.wohnzimmer.fenster.meta.ip'].common.role, 'info.ip');
         assert.strictEqual(adapter.objects['webhook.0.wohnzimmer.fenster.meta.timestamp'].common.role, 'date');
     });

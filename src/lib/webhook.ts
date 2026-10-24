@@ -1,6 +1,6 @@
 import type { ServerResponse } from 'node:http';
 
-import { detectRole } from './roles';
+import { detectCommon } from './roles';
 import type { JsonObject, JsonPrimitive, JsonValue, WebhookRequest } from './types';
 
 /** Maximum size of a JSON body: the default of body-parser, which was used before */
@@ -218,8 +218,8 @@ export class Webhook {
     }
 
     /**
-     * Recursively creates one state per primitive value. The role is guessed from the name on
-     * creation only, so roles changed by the user are kept.
+     * Recursively creates one state per primitive value. Role, unit and range are guessed from the
+     * name on creation only, so changes by the user are kept.
      */
     private async store(data: JsonObject | JsonValue[], parentPath: string, parentName?: string): Promise<void> {
         for (const [key, raw] of Object.entries(data)) {
@@ -236,10 +236,10 @@ export class Webhook {
                     type: 'state',
                     common: {
                         name: key,
-                        role: detectRole(key, type, parentName),
                         type,
                         read: true,
                         write: true,
+                        ...detectCommon(key, value, parentName),
                     },
                     native: {},
                 });

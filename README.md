@@ -55,7 +55,21 @@ Beim Anlegen eines Datenpunkts versucht der Adapter, anhand des Attributnamens e
 
 Ist der Name selbst unbekannt, wird der übergeordnete Name verwendet: `{"temperature": {"value": 21}}` oder `/temperatur?value=21` ergeben ebenfalls `value.temperature`. Ohne Treffer gilt je nach Typ `value`, `indicator` oder `text`.
 
-Die Rolle wird nur beim ersten Anlegen gesetzt – eine von Hand geänderte Rolle bleibt erhalten, bestehende Datenpunkte werden nicht angepasst.
+Für Zahlen werden zusätzlich Einheit sowie `min`/`max` gesetzt, wo sie eindeutig sind:
+
+| Attribut | Einheit | min / max |
+|---|---|---|
+| `temperature` | °C | – |
+| `humidity`, `battery`, `clouds`, `dimmer`, `position` | % | 0 / 100 |
+| `windDirection`, `heading` | ° | 0 / 360 |
+| `lat` / `lon` | ° | -90 / 90 bzw. -180 / 180 |
+| `pressure` | hPa | – |
+| `power`, `voltage`, `current`, `energy` | W, V, A, kWh | – |
+| `co2`, `pm2_5`, `rssi` | ppm, µg/m³, dBm | – |
+
+Eine Einheit im Namen hat Vorrang: `tempF` → °F, `power_kW` → kW, `energyWh` → Wh, `windSpeedKmh` → km/h, `pressure_pa` → Pa, `battery_mV` → mV. Namen mit `percent`/`pct`/`prozent` bekommen immer % und 0–100. Bei mehrdeutigen Größen wie `speed` oder `distance` wird nur eine Einheit aus dem Namen übernommen. Liegt der erste empfangene Wert außerhalb von `min`/`max` (z. B. `battery: 3000`), war die Vermutung falsch und Einheit und Grenzen entfallen.
+
+Rolle, Einheit und Grenzen werden nur beim ersten Anlegen gesetzt – von Hand geänderte Werte bleiben erhalten, bestehende Datenpunkte werden nicht angepasst.
 
 Unzulässige Zeichen in Pfad und Attributnamen werden durch `_` ersetzt. Zahlen in Textform (z. B. Query-Parameter) werden als Zahl gespeichert, wenn das verlustfrei geht – `"007"` bleibt Text.
 
@@ -107,7 +121,7 @@ Der Adapter behandelt Fehler beim Starten und Stoppen des Servers und protokolli
 
 - (bluefox) The adapter was refactored to TypeScript and JsonConfig
 - (bluefox) Breaking change: Node.js >= 22.19 is required
-- (bluefox) The state roles are detected from the attribute names (e.g. `temperature` -> `value.temperature`)
+- (bluefox) Role, unit and min/max of the states are detected from the attribute names (e.g. `temperature` -> `value.temperature` in °C, `power_kW` -> `value.power` in kW)
 - (bluefox) The adapter can run as a web extension (option "Extend WEB adapter")
 - (bluefox) express, body-parser and cors were replaced by node:http
 - (bluefox) Fixed: the adapter crashed if the port was in use, on `null` values and on characters that are not allowed in IDs (these are replaced by `_` now)
