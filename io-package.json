@@ -140,6 +140,10 @@
     "enabled": true,
     "extIcon": "https://raw.githubusercontent.com/MrErdnuss/ioBroker.iobroker-webhook/main/admin/webhook.png",
     "readme": "https://github.com/MrErdnuss/ioBroker.iobroker-webhook/blob/main/README.md",
+    "docs": {
+      "en": "README.md",
+      "de": "docs/de/README.md"
+    },
     "loglevel": "info",
     "tier": 3,
     "mode": "daemon",
