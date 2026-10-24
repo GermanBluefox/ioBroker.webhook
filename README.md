@@ -7,9 +7,10 @@ Der ioBroker Webhook Adapter ermöglicht es, HTTP-Anfragen zu empfangen und die 
 ## Installation
 
 1. Klone das Repository oder lade die Dateien herunter.
-2. Navigiere in das Verzeichnis des Adapters und installiere die Abhängigkeiten:
+2. Navigiere in das Verzeichnis des Adapters, installiere die Abhängigkeiten und baue den Adapter (der Quellcode liegt als TypeScript in `src/`):
    ```bash
-   npm install
+   npm ci
+   npm run build
    ```
 3. Starte den Adapter über die ioBroker Admin-Oberfläche oder über die Kommandozeile:
    ```bash
@@ -74,6 +75,16 @@ Der Adapter registriert die folgenden Ereignisse:
 Der Adapter behandelt Fehler beim Starten und Stoppen des Servers und protokolliert entsprechende Fehlermeldungen.
 
 ## Changelog
+<!--
+    Placeholder for the next version (at the beginning of the line):
+    ### **WORK IN PROGRESS**
+-->
+
+### **WORK IN PROGRESS**
+
+- (bluefox) The adapter was refactored to TypeScript and JsonConfig
+- (bluefox) Breaking change: Node.js >= 22.19 is required
+
 ### 0.2.4 (2025-01-25)
 
 - fixing get parameters

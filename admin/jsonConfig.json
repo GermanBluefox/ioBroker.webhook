@@ -1,0 +1,29 @@
+{
+    "i18n": true,
+    "type": "panel",
+    "items": {
+        "_logo": {
+            "type": "staticImage",
+            "src": "iobroker-webhook.png",
+            "style": { "width": "64px" },
+            "xs": 12,
+            "sm": 12,
+            "md": 12,
+            "lg": 12,
+            "xl": 12
+        },
+        "port": {
+            "newLine": true,
+            "type": "port",
+            "label": "Server port",
+            "min": 1,
+            "max": 65535,
+            "default": 8095,
+            "xs": 12,
+            "sm": 12,
+            "md": 4,
+            "lg": 2,
+            "xl": 2
+        }
+    }
+}
