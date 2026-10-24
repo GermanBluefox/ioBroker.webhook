@@ -6,7 +6,7 @@
     "name": "MrErdnuss",
     "email": "thomas.dick@inkblot.de"
   },
-  "homepage": "https://github.com/MrErdnuss/ioBroker.iobroker-webhook",
+  "homepage": "https://github.com/GermanBluefox/ioBroker.webhook",
   "license": "MIT",
   "keywords": [
     "ioBroker",
@@ -17,7 +17,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/MrErdnuss/ioBroker.iobroker-webhook.git"
+    "url": "https://github.com/GermanBluefox/ioBroker.webhook.git"
   },
   "engines": {
     "node": ">=22.19.0"
@@ -62,7 +62,7 @@
     "update-packages": "npx -y npm-check-updates --upgrade"
   },
   "bugs": {
-    "url": "https://github.com/MrErdnuss/ioBroker.iobroker-webhook/issues"
+    "url": "https://github.com/GermanBluefox/ioBroker.webhook/issues"
   },
   "readmeFilename": "README.md"
 }

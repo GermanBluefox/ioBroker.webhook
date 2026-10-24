@@ -79,5 +79,5 @@ jobs:
                   # Enter this token as a GitHub secret (with name SENTRY_AUTH_TOKEN) in the repository options
                   # Then uncomment and customize the following block:
                   # sentry-token: ${{ secrets.SENTRY_AUTH_TOKEN }}
-                  # sentry-project: 'iobroker-webhook'
+                  # sentry-project: 'webhook'
                   # sentry-version-prefix: 'iobroker.webhook'

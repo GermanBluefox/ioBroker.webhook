@@ -138,8 +138,8 @@
     "platform": "Javascript/Node.js",
     "icon": "webhook.png",
     "enabled": true,
-    "extIcon": "https://raw.githubusercontent.com/MrErdnuss/ioBroker.iobroker-webhook/main/admin/webhook.png",
-    "readme": "https://github.com/MrErdnuss/ioBroker.iobroker-webhook/blob/main/README.md",
+    "extIcon": "https://raw.githubusercontent.com/GermanBluefox/ioBroker.webhook/main/admin/webhook.png",
+    "readme": "https://github.com/GermanBluefox/ioBroker.webhook/blob/main/README.md",
     "docs": {
       "en": "README.md",
       "de": "docs/de/README.md"
