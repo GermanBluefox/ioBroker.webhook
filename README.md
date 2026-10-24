@@ -38,6 +38,27 @@ Die empfangenen Daten werden rekursiv verarbeitet und in ioBroker-Objekte umgewa
 - **Meta-Daten**: Informationen über die Anfrage (IP-Adresse, HTTP-Methode, Zeitstempel).
 - **Daten**: Bei POST, PUT und PATCH der JSON-Body (`Content-Type: application/json`, max. 100 KB), bei allen anderen Methoden die Query-Parameter (`?a=1&b[c]=2`).
 
+### Rollen
+
+Beim Anlegen eines Datenpunkts versucht der Adapter, anhand des Attributnamens eine passende [Rolle](https://github.com/ioBroker/ioBroker.docs/blob/master/docs/en/dev/stateroles.md) zu finden – in beliebiger Schreibweise (`outsideTemp`, `outside_temp`, `OUTSIDE-TEMP`) und für gängige englische und deutsche Begriffe, z. B.:
+
+| Attribut | Typ | Rolle |
+|---|---|---|
+| `temperature`, `temp`, `Temperatur` | Zahl | `value.temperature` |
+| `humidity`, `luftfeuchtigkeit` | Zahl | `value.humidity` |
+| `battery`, `akku` | Zahl / Boolean | `value.battery` / `indicator.lowbat` |
+| `co2`, `pm2_5`, `voc` | Zahl | `value.co2`, `value.pm25`, `value.tvoc` |
+| `power`, `voltage`, `energy` | Zahl | `value.power`, `value.voltage`, `value.energy` |
+| `motion`, `door`, `window`, `fenster` | Boolean | `sensor.motion`, `sensor.door`, `sensor.window` |
+| `lat`, `lon` | Zahl | `value.gps.latitude`, `value.gps.longitude` |
+| `ip`, `timestamp` | Text | `info.ip`, `date` |
+
+Ist der Name selbst unbekannt, wird der übergeordnete Name verwendet: `{"temperature": {"value": 21}}` oder `/temperatur?value=21` ergeben ebenfalls `value.temperature`. Ohne Treffer gilt je nach Typ `value`, `indicator` oder `text`.
+
+Die Rolle wird nur beim ersten Anlegen gesetzt – eine von Hand geänderte Rolle bleibt erhalten, bestehende Datenpunkte werden nicht angepasst.
+
+Unzulässige Zeichen in Pfad und Attributnamen werden durch `_` ersetzt. Zahlen in Textform (z. B. Query-Parameter) werden als Zahl gespeichert, wenn das verlustfrei geht – `"007"` bleibt Text.
+
 ### Pfadverarbeitung
 
 Der Adapter verarbeitet auch Pfade in den URLs der HTTP-Anfragen und speichert die Daten entsprechend der Pfadstruktur in ioBroker-Objekten. Zum Beispiel wird eine Anfrage an `/wohnzimmer/fenster` in die entsprechenden Pfade in ioBroker umgewandelt.
@@ -86,6 +107,7 @@ Der Adapter behandelt Fehler beim Starten und Stoppen des Servers und protokolli
 
 - (bluefox) The adapter was refactored to TypeScript and JsonConfig
 - (bluefox) Breaking change: Node.js >= 22.19 is required
+- (bluefox) The state roles are detected from the attribute names (e.g. `temperature` -> `value.temperature`)
 - (bluefox) The adapter can run as a web extension (option "Extend WEB adapter")
 - (bluefox) express, body-parser and cors were replaced by node:http
 - (bluefox) Fixed: the adapter crashed if the port was in use, on `null` values and on characters that are not allowed in IDs (these are replaced by `_` now)

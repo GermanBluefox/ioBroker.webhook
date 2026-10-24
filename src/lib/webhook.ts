@@ -1,5 +1,6 @@
 import type { ServerResponse } from 'node:http';
 
+import { detectRole } from './roles';
 import type { JsonObject, JsonPrimitive, JsonValue, WebhookRequest } from './types';
 
 /** Maximum size of a JSON body: the default of body-parser, which was used before */
@@ -166,20 +167,18 @@ export class Webhook {
             const pathname = queryStart === -1 ? url : url.substring(0, queryStart);
             const search = queryStart === -1 ? '' : url.substring(queryStart + 1);
 
+            const segments = pathname
+                .split('/')
+                .filter(part => part.trim() !== '')
+                .map(part => {
+                    try {
+                        return decodeURIComponent(part);
+                    } catch {
+                        return part;
+                    }
+                });
             // "/" is stored directly below the namespace
-            const basePath = this.toId(
-                pathname
-                    .split('/')
-                    .filter(part => part.trim() !== '')
-                    .map(part => {
-                        try {
-                            return decodeURIComponent(part);
-                        } catch {
-                            return part;
-                        }
-                    })
-                    .join('.'),
-            );
+            const basePath = this.toId(segments.join('.'));
             const prefix = basePath ? `${basePath}.` : '';
 
             const meta: JsonObject = {
@@ -191,7 +190,8 @@ export class Webhook {
             const data = BODY_METHODS.has(req.method ?? '') ? await parseBody(req) : parseQuery(search);
 
             await this.store(meta, `${prefix}meta`);
-            await this.store(data, `${prefix}data`);
+            // for the role, "/temperature?value=21" is like { "temperature": { "value": 21 } }
+            await this.store(data, `${prefix}data`, segments.at(-1));
 
             sendJson(res, 200, { status: 'success' });
         } catch (e) {
@@ -217,22 +217,27 @@ export class Webhook {
             .join('.');
     }
 
-    /** Recursively creates one state per primitive value */
-    private async store(data: JsonObject | JsonValue[], parentPath: string): Promise<void> {
+    /**
+     * Recursively creates one state per primitive value. The role is guessed from the name on
+     * creation only, so roles changed by the user are kept.
+     */
+    private async store(data: JsonObject | JsonValue[], parentPath: string, parentName?: string): Promise<void> {
         for (const [key, raw] of Object.entries(data)) {
             const id = `${parentPath}.${this.toId(key) || '_'}`;
 
             if (typeof raw === 'object' && raw !== null) {
-                await this.store(raw, id);
+                // list items have no name of their own: { "sensors": [{ "temp": 21 }] }
+                await this.store(raw, id, /^\d+$/.test(key) ? parentName : key);
             } else {
                 const value = normalizeValue(raw);
+                const type = determineType(value);
                 const fullId = `${this.namespace}.${id}`;
                 await this.adapter.setForeignObjectNotExistsAsync(fullId, {
                     type: 'state',
                     common: {
                         name: key,
-                        role: 'state',
-                        type: determineType(value),
+                        role: detectRole(key, type, parentName),
+                        type,
                         read: true,
                         write: true,
                     },

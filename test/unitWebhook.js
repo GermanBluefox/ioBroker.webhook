@@ -72,6 +72,10 @@ describe('Webhook', () => {
         assert.ok(adapter.states['webhook.0.wohnzimmer.fenster.meta.timestamp'].val);
         assert.strictEqual(adapter.objects['webhook.0.wohnzimmer.fenster.data.temperature'].common.type, 'number');
         assert.strictEqual(adapter.states['webhook.0.wohnzimmer.fenster.data.temperature'].ack, true);
+        assert.strictEqual(adapter.objects['webhook.0.wohnzimmer.fenster.data.temperature'].common.role, 'value.temperature');
+        assert.strictEqual(adapter.objects['webhook.0.wohnzimmer.fenster.data.sensor.open'].common.role, 'sensor.contact');
+        assert.strictEqual(adapter.objects['webhook.0.wohnzimmer.fenster.meta.ip'].common.role, 'info.ip');
+        assert.strictEqual(adapter.objects['webhook.0.wohnzimmer.fenster.meta.timestamp'].common.role, 'date');
     });
 
     it('should store query parameters of GET', async () => {
@@ -83,6 +87,7 @@ describe('Webhook', () => {
         assert.strictEqual(adapter.states['webhook.0.garten.data.zip'].val, '01067');
         assert.strictEqual(adapter.objects['webhook.0.garten.data.zip'].common.type, 'string');
         assert.strictEqual(adapter.states['webhook.0.garten.data.empty'].val, '');
+        assert.strictEqual(adapter.objects['webhook.0.garten.data.level'].common.role, 'value');
         assert.strictEqual(adapter.states['webhook.0.garten.data.name'].val, 'pump');
         assert.strictEqual(adapter.states['webhook.0.garten.meta.method'].val, 'GET');
     });
@@ -105,6 +110,17 @@ describe('Webhook', () => {
         assert.strictEqual(adapter.states['webhook.0.my room.a_b.data.nothing'].val, null);
         assert.strictEqual(adapter.objects['webhook.0.my room.a_b.data.nothing'].common.type, 'mixed');
         assert.strictEqual(adapter.objects['webhook.0.my room.a_b.data.x_y'].common.name, 'x?y');
+    });
+
+    it('should use the last path segment and the parent key for the role', async () => {
+        await fetch(`${baseUrl}/temperatur?value=21`);
+        assert.strictEqual(adapter.objects['webhook.0.temperatur.data.value'].common.role, 'value.temperature');
+        await fetch(`${baseUrl}/x`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ humidity: [{ value: 40 }] }),
+        });
+        assert.strictEqual(adapter.objects['webhook.0.x.data.humidity.0.value'].common.role, 'value.humidity');
     });
 
     it('should ignore bodies that are not JSON', async () => {
