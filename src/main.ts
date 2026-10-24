@@ -22,11 +22,11 @@ function determineType(value: JsonValue): string {
     return typeof value;
 }
 
-class IobrokerWebhook extends utils.Adapter {
+class WebhookAdapter extends utils.Adapter {
     private server: Server | null = null;
 
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
-        super({ ...options, name: 'iobroker-webhook' });
+        super({ ...options, name: 'webhook' });
 
         this.on('ready', () => this.onReady());
         this.on('stateChange', (id, state) => this.onStateChange(id, state));
@@ -117,8 +117,8 @@ class IobrokerWebhook extends utils.Adapter {
 
 if (require.main !== module) {
     // Export the constructor in compact mode
-    module.exports = (options: Partial<utils.AdapterOptions> | undefined) => new IobrokerWebhook(options);
+    module.exports = (options: Partial<utils.AdapterOptions> | undefined) => new WebhookAdapter(options);
 } else {
     // otherwise start the instance directly
-    (() => new IobrokerWebhook())();
+    (() => new WebhookAdapter())();
 }

@@ -4,7 +4,7 @@
     "items": {
         "_logo": {
             "type": "staticImage",
-            "src": "iobroker-webhook.png",
+            "src": "webhook.png",
             "style": { "width": "64px" },
             "xs": 12,
             "sm": 12,

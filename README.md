@@ -1,4 +1,4 @@
-![Logo](admin/iobroker-webhook.png)
+![Logo](admin/webhook.png)
 
 # ioBroker Webhook Adapter
 
@@ -14,7 +14,7 @@ Der ioBroker Webhook Adapter ermöglicht es, HTTP-Anfragen zu empfangen und die 
    ```
 3. Starte den Adapter über die ioBroker Admin-Oberfläche oder über die Kommandozeile:
    ```bash
-   iobroker start iobroker-webhook
+   iobroker start webhook
    ```
 
 ## Konfiguration
@@ -53,14 +53,14 @@ Angenommen, eine HTTP-POST-Anfrage wird an den Adapter gesendet mit folgendem JS
 
 Der Adapter speichert die Daten in den folgenden ioBroker-Objekten:
 
-- `webhook.wohnzimmer.fenster.data.temperature`
-- `webhook.wohnzimmer.fenster.data.humidity`
+- `webhook.0.wohnzimmer.fenster.data.temperature`
+- `webhook.0.wohnzimmer.fenster.data.humidity`
 
 Zusätzlich werden Meta-Daten gespeichert:
 
-- `webhook.wohnzimmer.fenster.meta.ip`
-- `webhook.wohnzimmer.fenster.meta.method`
-- `webhook.wohnzimmer.fenster.meta.timestamp`
+- `webhook.0.wohnzimmer.fenster.meta.ip`
+- `webhook.0.wohnzimmer.fenster.meta.method`
+- `webhook.0.wohnzimmer.fenster.meta.timestamp`
 
 ## Ereignisse
 
@@ -84,6 +84,7 @@ Der Adapter behandelt Fehler beim Starten und Stoppen des Servers und protokolli
 
 - (bluefox) The adapter was refactored to TypeScript and JsonConfig
 - (bluefox) Breaking change: Node.js >= 22.19 is required
+- (bluefox) Breaking change: the adapter was renamed from `iobroker-webhook` to `webhook`. Existing `iobroker-webhook` instances must be replaced by a new `webhook` instance, the state IDs change from `iobroker-webhook.X.*` to `webhook.X.*`
 
 ### 0.2.4 (2025-01-25)
 

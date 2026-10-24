@@ -1,7 +1,7 @@
 {
-  "name": "iobroker.iobroker-webhook",
+  "name": "iobroker.webhook",
   "version": "0.2.4",
-  "description": "iobroker-webhook",
+  "description": "Receives HTTP webhooks and stores the transmitted data as ioBroker states",
   "author": {
     "name": "MrErdnuss",
     "email": "thomas.dick@inkblot.de"
@@ -10,7 +10,8 @@
   "license": "MIT",
   "keywords": [
     "ioBroker",
-    "template",
+    "webhook",
+    "http",
     "Smart Home",
     "home automation"
   ],

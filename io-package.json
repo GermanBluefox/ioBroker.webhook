@@ -1,6 +1,6 @@
 {
   "common": {
-    "name": "iobroker-webhook",
+    "name": "webhook",
     "version": "0.2.4",
     "news": {
       "0.2.4": {
@@ -109,24 +109,25 @@
       "zh-cn": "网络钩子"
     },
     "desc": {
-      "en": "iobroker-webhook",
-      "de": "iobroker-webhook",
-      "ru": "iobroker-webhook",
-      "pt": "iobroker-webhook",
-      "nl": "iobroker-webhook",
-      "fr": "webhook iobroker",
-      "it": "iobroker-webhook",
-      "es": "iobroker-webhook",
-      "pl": "iobroker-webhook",
-      "uk": "iobroker-вебхук",
-      "zh-cn": "iobroker-webhook"
+      "en": "Receives HTTP webhooks and stores the transmitted data as states",
+      "de": "Empfängt HTTP-Webhooks und speichert die übermittelten Daten als Datenpunkte",
+      "ru": "Принимает HTTP-вебхуки и сохраняет переданные данные как состояния",
+      "pt": "Recebe webhooks HTTP e armazena os dados transmitidos como estados",
+      "nl": "Ontvangt HTTP-webhooks en slaat de verzonden gegevens op als states",
+      "fr": "Reçoit des webhooks HTTP et enregistre les données transmises sous forme d’états",
+      "it": "Riceve webhook HTTP e salva i dati trasmessi come stati",
+      "es": "Recibe webhooks HTTP y guarda los datos transmitidos como estados",
+      "pl": "Odbiera webhooki HTTP i zapisuje przesłane dane jako stany",
+      "uk": "Приймає HTTP-вебхуки та зберігає передані дані як стани",
+      "zh-cn": "接收 HTTP Webhook 并将传输的数据保存为状态"
     },
     "authors": [
       "MrErdnuss <thomas.dick@inkblot.de>"
     ],
     "keywords": [
       "ioBroker",
-      "template",
+      "webhook",
+      "http",
       "Smart Home",
       "home automation"
     ],
@@ -135,9 +136,9 @@
       "license": "MIT"
     },
     "platform": "Javascript/Node.js",
-    "icon": "iobroker-webhook.png",
+    "icon": "webhook.png",
     "enabled": true,
-    "extIcon": "https://raw.githubusercontent.com/MrErdnuss/ioBroker.iobroker-webhook/main/admin/iobroker-webhook.png",
+    "extIcon": "https://raw.githubusercontent.com/MrErdnuss/ioBroker.iobroker-webhook/main/admin/webhook.png",
     "readme": "https://github.com/MrErdnuss/ioBroker.iobroker-webhook/blob/main/README.md",
     "loglevel": "info",
     "tier": 3,

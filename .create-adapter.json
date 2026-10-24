@@ -1,7 +1,7 @@
 {
 	"cli": true,
 	"target": "directory",
-	"adapterName": "iobroker-webhook",
+	"adapterName": "webhook",
 	"title": "Webhook",
 	"expert": "no",
 	"features": [
