@@ -23,10 +23,7 @@
     "node": ">=22.19.0"
   },
   "dependencies": {
-    "@iobroker/adapter-core": "^3.4.3",
-    "body-parser": "^1.20.4",
-    "cors": "^2.8.6",
-    "express": "^4.22.1"
+    "@iobroker/adapter-core": "^3.4.3"
   },
   "devDependencies": {
     "@alcalzone/release-script": "^5.2.1",
@@ -38,9 +35,6 @@
     "@iobroker/testing": "^6.3.1",
     "@iobroker/types": "^7.2.5",
     "@tsconfig/node22": "^22.0.6",
-    "@types/body-parser": "^1.19.6",
-    "@types/cors": "^2.8.19",
-    "@types/express": "^4.17.25",
     "@types/node": "^22.20.5",
     "typescript": "~6.0.3"
   },
@@ -57,8 +51,9 @@
     "check": "tsc -p tsconfig.json --noEmit",
     "lint": "eslint -c eslint.config.mjs",
     "test:package": "mocha test/packageFiles --exit",
+    "test:unit": "mocha test/unitWebhook --exit",
     "test:integration": "mocha test/integrationAdapter --exit",
-    "test": "npm run test:package",
+    "test": "npm run test:package && npm run test:unit",
     "translate": "translate-adapter -b admin/i18n/en.json",
     "release": "release-script",
     "release-patch": "release-script patch --yes",

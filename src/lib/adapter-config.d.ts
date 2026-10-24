@@ -3,8 +3,12 @@
 declare global {
     namespace ioBroker {
         interface AdapterConfig {
-            /** Port of the webhook HTTP server */
+            /** Port of the own HTTP server (standalone mode only) */
             port: number;
+            /** Web instance ("web.0" or "*" for all) to run in as a web extension, "" for standalone */
+            webInstance: string;
+            /** Path below the web adapter in extension mode, e.g. "webhook" */
+            route: string;
         }
     }
 }

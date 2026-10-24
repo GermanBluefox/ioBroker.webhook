@@ -1,3 +1,8 @@
 {
-    "Server port": "Serverpoort"
+    "Server port": "Serverpoort",
+    "Extend WEB adapter": "WEB-adapter uitbreiden",
+    "Run as a part of the web adapter instead of an own server": "Als onderdeel van de web-adapter draaien in plaats van een eigen server",
+    "Route": "Route",
+    "Webhooks are received under http(s)://<web>/<route>/...": "Webhooks worden ontvangen onder http(s)://<web>/<route>/...",
+    "Only letters, digits, \"-\", \"_\" and \"/\" are allowed": "Alleen letters, cijfers, \"-\", \"_\" en \"/\" zijn toegestaan"
 }

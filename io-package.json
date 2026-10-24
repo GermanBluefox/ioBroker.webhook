@@ -143,6 +143,7 @@
     "loglevel": "info",
     "tier": 3,
     "mode": "daemon",
+    "webExtension": "build/lib/web.js",
     "type": "communication",
     "compact": true,
     "nogit": true,
@@ -163,8 +164,57 @@
     ]
   },
   "native": {
-    "port": 8095
+    "port": 8095,
+    "webInstance": "",
+    "route": "webhook"
   },
   "objects": [],
-  "instanceObjects": []
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": {
+          "en": "Information",
+          "de": "Information",
+          "ru": "Информация",
+          "pt": "Em formação",
+          "nl": "Informatie",
+          "fr": "Information",
+          "it": "Informazione",
+          "es": "Información",
+          "pl": "Informacja",
+          "uk": "Інформація",
+          "zh-cn": "信息"
+        }
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.extension",
+      "type": "state",
+      "common": {
+        "role": "indicator",
+        "name": {
+          "en": "If instance is in only extension mode",
+          "de": "Ob die Instanz nur als Erweiterung läuft",
+          "ru": "Работает ли экземпляр только как расширение",
+          "pt": "Se a instância está apenas em modo de extensão",
+          "nl": "Of de instantie alleen als extensie draait",
+          "fr": "Si l’instance fonctionne uniquement comme extension",
+          "it": "Se l’istanza è solo in modalità estensione",
+          "es": "Si la instancia está solo en modo extensión",
+          "pl": "Czy instancja działa tylko jako rozszerzenie",
+          "uk": "Чи працює екземпляр лише як розширення",
+          "zh-cn": "实例是否仅以扩展模式运行"
+        },
+        "type": "boolean",
+        "read": true,
+        "write": false,
+        "expert": true,
+        "def": false
+      },
+      "native": {}
+    }
+  ]
 }

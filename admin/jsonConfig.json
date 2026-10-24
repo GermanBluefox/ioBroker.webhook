@@ -12,6 +12,19 @@
             "lg": 12,
             "xl": 12
         },
+        "webInstance": {
+            "newLine": true,
+            "type": "instance",
+            "label": "Extend WEB adapter",
+            "help": "Run as a part of the web adapter instead of an own server",
+            "adapter": "web",
+            "all": true,
+            "xs": 12,
+            "sm": 12,
+            "md": 6,
+            "lg": 4,
+            "xl": 4
+        },
         "port": {
             "newLine": true,
             "type": "port",
@@ -19,6 +32,23 @@
             "min": 1,
             "max": 65535,
             "default": 8095,
+            "hidden": "!!data.webInstance",
+            "xs": 12,
+            "sm": 12,
+            "md": 4,
+            "lg": 2,
+            "xl": 2
+        },
+        "route": {
+            "newLine": true,
+            "type": "text",
+            "label": "Route",
+            "help": "Webhooks are received under http(s)://<web>/<route>/...",
+            "default": "webhook",
+            "hidden": "!data.webInstance",
+            "validator": "/^[\/a-zA-Z0-9_-]*$/.test(data.route || '')",
+            "validatorErrorText": "Only letters, digits, \"-\", \"_\" and \"/\" are allowed",
+            "validatorNoSaveOnError": true,
             "xs": 12,
             "sm": 12,
             "md": 4,

@@ -1,3 +1,8 @@
 {
-    "Server port": "Порт сервера"
+    "Server port": "Порт сервера",
+    "Extend WEB adapter": "Розширити WEB-адаптер",
+    "Run as a part of the web adapter instead of an own server": "Працювати як частина web-адаптера замість власного сервера",
+    "Route": "Маршрут",
+    "Webhooks are received under http(s)://<web>/<route>/...": "Вебхуки приймаються за адресою http(s)://<web>/<route>/...",
+    "Only letters, digits, \"-\", \"_\" and \"/\" are allowed": "Дозволені лише літери, цифри, \"-\", \"_\" та \"/\""
 }

@@ -1,3 +1,8 @@
 {
-    "Server port": "服务器端口"
+    "Server port": "服务器端口",
+    "Extend WEB adapter": "扩展 WEB 适配器",
+    "Run as a part of the web adapter instead of an own server": "作为 web 适配器的一部分运行，而不是使用自己的服务器",
+    "Route": "路由",
+    "Webhooks are received under http(s)://<web>/<route>/...": "Webhook 通过 http(s)://<web>/<route>/... 接收",
+    "Only letters, digits, \"-\", \"_\" and \"/\" are allowed": "只允许字母、数字、\"-\"、\"_\" 和 \"/\""
 }

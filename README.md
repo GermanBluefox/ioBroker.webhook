@@ -21,20 +21,22 @@ Der ioBroker Webhook Adapter ermöglicht es, HTTP-Anfragen zu empfangen und die 
 
 Der Adapter kann über die ioBroker Admin-Oberfläche konfiguriert werden. Die wichtigsten Konfigurationsoptionen sind:
 
-- **Port**: Der Port, auf dem der Webhook-Server lauscht (Standard: 8095).
+- **WEB-Adapter erweitern**: Ist hier eine `web`-Instanz (oder „alle“) ausgewählt, startet der Adapter keinen eigenen Server, sondern läuft als Erweiterung des Web-Adapters auf dessen Port (inkl. HTTPS und Authentifizierung des Web-Adapters). Die Instanz selbst beendet sich dann nach dem Start, das ist so gewollt.
+- **Port**: Der Port, auf dem der eigene Webhook-Server lauscht (Standard: 8095). Nur ohne Web-Erweiterung.
+- **Route**: Pfad unter dem Web-Adapter (Standard: `webhook`). Webhooks werden dann unter `http(s)://<web>:8082/webhook/<pfad>` empfangen. Nur als Web-Erweiterung.
 
 ## Funktionsweise
 
 ### Webhook-Server
 
-Der Adapter startet einen Express-Server, der HTTP-Anfragen auf dem konfigurierten Port empfängt. Die empfangenen Daten werden in ioBroker-Objekte umgewandelt und gespeichert.
+Der Adapter startet einen schlanken HTTP-Server (ohne zusätzliche Abhängigkeiten), der HTTP-Anfragen auf dem konfigurierten Port empfängt – oder hängt sich als Erweiterung in den Web-Adapter ein. Die empfangenen Daten werden in ioBroker-Objekte umgewandelt und gespeichert.
 
 ### Datenverarbeitung
 
 Die empfangenen Daten werden rekursiv verarbeitet und in ioBroker-Objekte umgewandelt. Dabei werden die Daten in zwei Kategorien unterteilt:
 
 - **Meta-Daten**: Informationen über die Anfrage (IP-Adresse, HTTP-Methode, Zeitstempel).
-- **Daten**: Die eigentlichen Daten aus dem Anfrage-Body.
+- **Daten**: Bei POST der JSON-Body (`Content-Type: application/json`, max. 100 KB), bei allen anderen Methoden die Query-Parameter (`?a=1&b[c]=2`).
 
 ### Pfadverarbeitung
 
@@ -84,6 +86,8 @@ Der Adapter behandelt Fehler beim Starten und Stoppen des Servers und protokolli
 
 - (bluefox) The adapter was refactored to TypeScript and JsonConfig
 - (bluefox) Breaking change: Node.js >= 22.19 is required
+- (bluefox) The adapter can run as a web extension (option "Extend WEB adapter")
+- (bluefox) express, body-parser and cors were replaced by node:http
 - (bluefox) Breaking change: the adapter was renamed from `iobroker-webhook` to `webhook`. Existing `iobroker-webhook` instances must be replaced by a new `webhook` instance, the state IDs change from `iobroker-webhook.X.*` to `webhook.X.*`
 
 ### 0.2.4 (2025-01-25)
