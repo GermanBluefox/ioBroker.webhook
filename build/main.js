@@ -75,8 +75,7 @@ class WebhookAdapter extends utils.Adapter {
     }
     /** The exclusive-resource API of js-controller 8, or null if the controller does not have it */
     resourceRegistry() {
-        const registry = this;
-        return typeof registry.registerUsedResource === 'function' ? registry : null;
+        return typeof this.registerUsedResource === 'function' ? this : null;
     }
     /** Asks js-controller (>= 8), which instances registered the port, e.g. "web.0" */
     async findPortHolders(port) {
